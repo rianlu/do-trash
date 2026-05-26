@@ -23,6 +23,28 @@
 - 支持单条还原和当前页全部还原
 - 配置保存在浏览器本地, 不上传任何数据
 
+## 截图
+
+### 插件弹窗
+
+<img src="./assets/screenshots/popup-main.png" alt="do-trash 插件弹窗" width="420" />
+
+### 悬浮图标调整
+
+<img src="./assets/screenshots/popup-floating-size.png" alt="do-trash 悬浮图标大小调整" width="420" />
+
+### 完整设置
+
+<img src="./assets/screenshots/options-rules.png" alt="do-trash 完整设置页" width="760" />
+
+### 页面悬浮垃圾桶
+
+<img src="./assets/screenshots/floating-trash.png" alt="do-trash 页面悬浮垃圾桶" width="88" />
+
+### 当前页垃圾桶面板
+
+<img src="./assets/screenshots/trash-panel.png" alt="do-trash 当前页垃圾桶面板" width="480" />
+
 ## 安装
 
 1. 克隆或下载本仓库.
