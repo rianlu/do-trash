@@ -11,7 +11,8 @@
     schemaVersion: CONFIG_VERSION,
     enabled: true,
     ui: {
-      floatingSize: DEFAULT_FLOATING_SIZE
+      floatingSize: DEFAULT_FLOATING_SIZE,
+      showFloating: true
     },
     rules: {
       keywords: [],
@@ -80,10 +81,7 @@
     if (!hasExtensionContext()) return;
     loadConfig().then(() => {
       if (isDisposed) return;
-      injectStyles();
-      ensurePanel();
-      applyUiConfig();
-      loadPosition();
+      syncFloatingUi();
       scanNow();
       startObserver();
       bindStorageChanges();
@@ -131,7 +129,8 @@
       schemaVersion: CONFIG_VERSION,
       enabled: incoming.enabled === false ? false : true,
       ui: {
-        floatingSize: normalizeFloatingSize(incomingUi.floatingSize)
+        floatingSize: normalizeFloatingSize(incomingUi.floatingSize),
+        showFloating: incomingUi.showFloating === false ? false : true
       },
       rules: {
         keywords: normalizeRuleList(incomingRules.keywords),
@@ -233,7 +232,7 @@
         if (isDisposed) return;
         if (areaName !== 'local' || !changes[CONFIG_KEY]) return;
         config = normalizeConfig(changes[CONFIG_KEY].newValue);
-        applyUiConfig();
+        syncFloatingUi();
         restoredTopicKeys = new Set();
         rescanAll();
       });
@@ -253,6 +252,34 @@
     const rect = ui.root.getBoundingClientRect();
     applyPosition({ left: rect.left, top: rect.top });
     if (ui.panel && ui.panel.classList.contains('is-open')) positionPanel();
+  }
+
+  function shouldShowFloatingUi() {
+    return config.ui && config.ui.showFloating !== false;
+  }
+
+  function syncFloatingUi() {
+    if (isDisposed) return;
+    if (!shouldShowFloatingUi()) {
+      removeFloatingUi();
+      return;
+    }
+    injectStyles();
+    ensurePanel();
+    if (ui.root) ui.root.hidden = false;
+    applyUiConfig();
+    renderTrash();
+    loadPosition();
+  }
+
+  function removeFloatingUi() {
+    const root = ui.root || document.getElementById('do-trash-root');
+    if (!root) return;
+    root.hidden = true;
+    const panel = root.querySelector('#do-trash-panel');
+    const toggle = root.querySelector('#do-trash-toggle');
+    if (panel) panel.classList.remove('is-open');
+    if (toggle) toggle.setAttribute('aria-expanded', 'false');
   }
 
   function injectStyles() {
@@ -1072,7 +1099,9 @@
     SELECTORS.topicRows.forEach((selector) => {
       document.querySelectorAll(selector).forEach((row) => rows.add(row));
     });
-    return Array.from(rows).filter((row) => row instanceof HTMLElement && !ui.root.contains(row));
+    return Array.from(rows).filter((row) => {
+      return row instanceof HTMLElement && (!ui.root || !ui.root.contains(row));
+    });
   }
 
   function firstMatch(root, selectors) {

@@ -5,7 +5,8 @@ const DEFAULT_CONFIG = {
   schemaVersion: CONFIG_VERSION,
   enabled: true,
   ui: {
-    floatingSize: DEFAULT_FLOATING_SIZE
+    floatingSize: DEFAULT_FLOATING_SIZE,
+    showFloating: true
   },
   rules: {
     keywords: [],
@@ -64,7 +65,8 @@ function normalizeConfig(value) {
     schemaVersion: CONFIG_VERSION,
     enabled: incoming.enabled === false ? false : true,
     ui: {
-      floatingSize: normalizeFloatingSize(ui.floatingSize)
+      floatingSize: normalizeFloatingSize(ui.floatingSize),
+      showFloating: ui.showFloating === false ? false : true
     },
     rules: {
       keywords: normalizeRuleList(rules.keywords),

@@ -6,7 +6,8 @@ const DEFAULT_CONFIG = {
   schemaVersion: CONFIG_VERSION,
   enabled: true,
   ui: {
-    floatingSize: DEFAULT_FLOATING_SIZE
+    floatingSize: DEFAULT_FLOATING_SIZE,
+    showFloating: true
   },
   rules: {
     keywords: [],
@@ -20,6 +21,7 @@ const enabledInput = document.getElementById('enabled');
 const keywordInput = document.getElementById('keyword');
 const addKeywordButton = document.getElementById('add-keyword');
 const openOptionsButton = document.getElementById('open-options');
+const showFloatingInput = document.getElementById('show-floating');
 const floatingSizeToggle = document.getElementById('floating-size-toggle');
 const floatingSizePanel = document.getElementById('floating-size-panel');
 const floatingSizeValue = document.getElementById('floating-size-value');
@@ -77,7 +79,8 @@ function normalizeConfig(value) {
     schemaVersion: CONFIG_VERSION,
     enabled: incoming.enabled === false ? false : true,
     ui: {
-      floatingSize: normalizeFloatingSize(ui.floatingSize)
+      floatingSize: normalizeFloatingSize(ui.floatingSize),
+      showFloating: ui.showFloating === false ? false : true
     },
     rules: {
       keywords: normalizeRuleList(rules.keywords),
@@ -105,8 +108,9 @@ async function loadConfig() {
   config = normalizeConfig(result[CONFIG_KEY]);
   await chrome.storage.local.set({ [CONFIG_KEY]: config });
   enabledInput.checked = config.enabled;
+  showFloatingInput.checked = config.ui.showFloating;
   renderStatus();
-  renderFloatingSize();
+  renderFloatingSettings();
 }
 
 async function loadStats() {
@@ -120,6 +124,12 @@ function bindEvents() {
   enabledInput.addEventListener('change', async () => {
     config.enabled = enabledInput.checked;
     await saveConfig('状态已更新');
+  });
+
+  showFloatingInput.addEventListener('change', async () => {
+    if (!config.ui) config.ui = {};
+    config.ui.showFloating = showFloatingInput.checked;
+    await saveConfig(showFloatingInput.checked ? '悬浮垃圾桶已显示' : '悬浮垃圾桶已隐藏');
   });
 
   addKeywordButton.addEventListener('click', addKeyword);
@@ -142,8 +152,9 @@ function bindEvents() {
     if (changes[CONFIG_KEY]) {
       config = normalizeConfig(changes[CONFIG_KEY].newValue);
       enabledInput.checked = config.enabled;
+      showFloatingInput.checked = config.ui.showFloating;
       renderStatus();
-      renderFloatingSize();
+      renderFloatingSettings();
     }
   });
 }
@@ -151,7 +162,7 @@ function bindEvents() {
 async function addKeyword() {
   const value = normalizeText(keywordInput.value);
   if (!value) {
-    setMessage('请输入关键词');
+    setMessage('请输入关键词', 'warning');
     return;
   }
 
@@ -168,7 +179,7 @@ async function saveConfig(text) {
   config = normalizeConfig(config);
   await chrome.storage.local.set({ [CONFIG_KEY]: config });
   renderStatus();
-  renderFloatingSize();
+  renderFloatingSettings();
   setMessage(text);
 }
 
@@ -176,20 +187,33 @@ function renderStatus() {
   statusText.textContent = config.enabled ? '运行中' : '已暂停';
 }
 
-function renderFloatingSize() {
+function renderFloatingSettings() {
+  const showFloating = config.ui && config.ui.showFloating !== false;
   const size = normalizeFloatingSize(config.ui && config.ui.floatingSize);
   const text = `${size} px`;
+  showFloatingInput.checked = showFloating;
+  floatingSizeToggle.disabled = !showFloating;
+  decreaseFloatingSizeButton.disabled = !showFloating;
+  increaseFloatingSizeButton.disabled = !showFloating;
+  resetFloatingSizeButton.disabled = !showFloating;
   floatingSizeValue.textContent = text;
   floatingSizePreview.textContent = text;
+
+  if (!showFloating && floatingSizePanel.classList.contains('is-open')) {
+    floatingSizePanel.classList.remove('is-open');
+    floatingSizeToggle.setAttribute('aria-expanded', 'false');
+  }
 }
 
 function toggleFloatingSizePanel() {
+  if (config.ui && config.ui.showFloating === false) return;
   const isOpen = floatingSizePanel.classList.toggle('is-open');
   floatingSizeToggle.setAttribute('aria-expanded', String(isOpen));
 }
 
 async function adjustFloatingSize(delta) {
   if (!config.ui) config.ui = {};
+  if (config.ui.showFloating === false) return;
   const nextSize = normalizeFloatingSize(config.ui.floatingSize + delta);
   if (nextSize === config.ui.floatingSize) return;
   config.ui.floatingSize = nextSize;
@@ -198,15 +222,19 @@ async function adjustFloatingSize(delta) {
 
 async function resetFloatingSize() {
   if (!config.ui) config.ui = {};
+  if (config.ui.showFloating === false) return;
   if (config.ui.floatingSize === DEFAULT_FLOATING_SIZE) return;
   config.ui.floatingSize = DEFAULT_FLOATING_SIZE;
   await saveConfig('悬浮图标大小已重置');
 }
 
-function setMessage(text) {
+function setMessage(text, tone = 'success') {
   message.textContent = text;
+  message.dataset.tone = tone;
+  message.classList.toggle('is-visible', Boolean(text));
   window.clearTimeout(setMessage.timer);
   setMessage.timer = window.setTimeout(() => {
     message.textContent = '';
+    message.classList.remove('is-visible');
   }, 1800);
 }
