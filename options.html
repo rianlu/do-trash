@@ -1,0 +1,553 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>do-trash 设置</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #1c1c1e;
+      --ink-soft: #4b4b50;
+      --paper: #ffffff;
+      --panel: #f8f8f5;
+      --line: #deded8;
+      --line-soft: #ecece7;
+      --accent: #ffb003;
+      --accent-strong: #c57f00;
+      --success: #2f7d4f;
+      --danger: #d14d41;
+      --shadow: rgba(28, 28, 30, 0.12);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(255, 176, 3, 0.14), transparent 28rem),
+        var(--panel);
+    }
+
+    body {
+      margin: 0;
+    }
+
+    main {
+      width: min(1040px, calc(100vw - 32px));
+      margin: 0 auto;
+      padding: 30px 0 42px;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: var(--ink);
+      color: var(--accent);
+      box-shadow: inset 0 0 0 1px rgba(255, 176, 3, 0.28);
+      flex: 0 0 auto;
+    }
+
+    .mark img {
+      width: 42px;
+      height: 42px;
+      display: block;
+      border-radius: 12px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 24px;
+      line-height: 32px;
+      font-weight: 780;
+    }
+
+    .subtitle {
+      margin-top: 2px;
+      color: var(--ink-soft);
+      font-size: 13px;
+      line-height: 18px;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    section {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      overflow: hidden;
+      box-shadow: 0 10px 24px var(--shadow);
+    }
+
+    section.full {
+      grid-column: 1 / -1;
+    }
+
+    .section-head {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line-soft);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background:
+        linear-gradient(90deg, rgba(255, 176, 3, 0.12), rgba(255, 176, 3, 0)),
+        var(--panel);
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .section-icon {
+      width: 26px;
+      height: 26px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      color: var(--accent-strong);
+      background: rgba(255, 176, 3, 0.12);
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+    }
+
+    .section-icon svg {
+      width: 15px;
+      height: 15px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 16px;
+      line-height: 22px;
+    }
+
+    .count {
+      color: var(--ink-soft);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .add-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line-soft);
+    }
+
+    input[type="text"],
+    textarea {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 0 10px;
+      box-sizing: border-box;
+      background: var(--paper);
+      color: var(--ink);
+      font: inherit;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.14s ease, box-shadow 0.14s ease;
+    }
+
+    input[type="text"]:focus,
+    textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(255, 176, 3, 0.18);
+    }
+
+    input[type="text"] {
+      height: 36px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 160px;
+      padding: 10px;
+      resize: vertical;
+      line-height: 20px;
+    }
+
+    button {
+      height: 36px;
+      border: 1px solid var(--ink);
+      border-radius: 6px;
+      padding: 0 12px;
+      background: var(--ink);
+      color: var(--paper);
+      cursor: pointer;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: transform 0.14s ease, border-color 0.14s ease, background 0.14s ease;
+    }
+
+    button svg {
+      width: 15px;
+      height: 15px;
+    }
+
+    button.secondary {
+      border-color: var(--line);
+      background: var(--paper);
+      color: var(--ink);
+    }
+
+    button.danger {
+      border-color: rgba(209, 77, 65, 0.34);
+      background: rgba(209, 77, 65, 0.08);
+      color: var(--danger);
+    }
+
+    button.icon {
+      width: 30px;
+      height: 30px;
+      padding: 0;
+      display: inline-grid;
+      place-items: center;
+    }
+
+    button:hover {
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    li {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 10px;
+      min-height: 44px;
+      padding: 8px 16px;
+      border-bottom: 1px solid var(--line-soft);
+      box-sizing: border-box;
+      transition: background 0.14s ease;
+    }
+
+    li:hover {
+      background: #fbfaf5;
+    }
+
+    li:last-child {
+      border-bottom: 0;
+    }
+
+    .empty {
+      display: block;
+      color: var(--ink-soft);
+      padding: 18px 16px;
+      font-size: 13px;
+      line-height: 20px;
+    }
+
+    .rule-value {
+      min-width: 0;
+      overflow-wrap: anywhere;
+      font-size: 14px;
+      line-height: 20px;
+    }
+
+    .rule-value.disabled {
+      color: #8a8a84;
+      text-decoration: line-through;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-flex;
+      width: 38px;
+      height: 22px;
+    }
+
+    .switch input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .slider {
+      width: 100%;
+      border-radius: 999px;
+      background: #c9c9c3;
+      cursor: pointer;
+      transition: background 0.18s ease;
+    }
+
+    .slider::before {
+      content: "";
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      left: 3px;
+      top: 3px;
+      border-radius: 50%;
+      background: var(--paper);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.28);
+      transition: transform 0.18s ease;
+    }
+
+    input:checked + .slider {
+      background: var(--accent);
+    }
+
+    input:checked + .slider::before {
+      transform: translateX(16px);
+    }
+
+    .io {
+      padding: 14px 16px;
+    }
+
+    .io-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .message {
+      min-height: 20px;
+      margin-top: 12px;
+      color: var(--success);
+      font-size: 13px;
+      line-height: 20px;
+    }
+
+    @media (max-width: 760px) {
+      header {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .toolbar {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .layout {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div class="brand">
+        <div class="mark" aria-hidden="true">
+          <img src="assets/icon-128.png" alt="">
+        </div>
+        <div>
+          <h1>do-trash 设置</h1>
+          <div class="subtitle">管理本地规则, 即时同步到 LINUX.DO 页面</div>
+        </div>
+      </div>
+      <div class="toolbar">
+        <button id="export-config" class="secondary" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <path d="M7 10l5 5 5-5"></path>
+            <path d="M12 15V3"></path>
+          </svg>
+          导出配置
+        </button>
+        <button id="reset-config" class="danger" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 6h18"></path>
+            <path d="M8 6V4h8v2"></path>
+            <path d="M7 6l1 15h8l1-15"></path>
+          </svg>
+          重置默认
+        </button>
+      </div>
+    </header>
+
+    <div class="layout">
+      <section data-rule-section="keywords">
+        <div class="section-head">
+          <div class="section-title">
+            <span class="section-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 7h16"></path>
+                <path d="M8 12h8"></path>
+                <path d="M10 17h4"></path>
+              </svg>
+            </span>
+            <h2>关键词</h2>
+          </div>
+          <span class="count" data-count="keywords">0 条</span>
+        </div>
+        <div class="add-row">
+          <input type="text" data-input="keywords" placeholder="输入标题关键词">
+          <button type="button" data-add="keywords">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 5v14M5 12h14"></path>
+            </svg>
+            添加
+          </button>
+        </div>
+        <ul data-list="keywords"></ul>
+      </section>
+
+      <section data-rule-section="categories">
+        <div class="section-head">
+          <div class="section-title">
+            <span class="section-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 7h16"></path>
+                <path d="M4 12h10"></path>
+                <path d="M4 17h7"></path>
+              </svg>
+            </span>
+            <h2>类别</h2>
+          </div>
+          <span class="count" data-count="categories">0 条</span>
+        </div>
+        <div class="add-row">
+          <input type="text" data-input="categories" placeholder="输入类别名称">
+          <button type="button" data-add="categories">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 5v14M5 12h14"></path>
+            </svg>
+            添加
+          </button>
+        </div>
+        <ul data-list="categories"></ul>
+      </section>
+
+      <section data-rule-section="tags">
+        <div class="section-head">
+          <div class="section-title">
+            <span class="section-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 10l-8.5 8.5a2.1 2.1 0 0 1-3 0L3.5 13.5a2.1 2.1 0 0 1 0-3L12 2h8v8z"></path>
+                <path d="M16 6h.01"></path>
+              </svg>
+            </span>
+            <h2>标签</h2>
+          </div>
+          <span class="count" data-count="tags">0 条</span>
+        </div>
+        <div class="add-row">
+          <input type="text" data-input="tags" placeholder="输入标签名称">
+          <button type="button" data-add="tags">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 5v14M5 12h14"></path>
+            </svg>
+            添加
+          </button>
+        </div>
+        <ul data-list="tags"></ul>
+      </section>
+
+      <section data-rule-section="authors">
+        <div class="section-head">
+          <div class="section-title">
+            <span class="section-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21a8 8 0 0 0-16 0"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+            </span>
+            <h2>作者</h2>
+          </div>
+          <span class="count" data-count="authors">0 条</span>
+        </div>
+        <div class="add-row">
+          <input type="text" data-input="authors" placeholder="输入用户名">
+          <button type="button" data-add="authors">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 5v14M5 12h14"></path>
+            </svg>
+            添加
+          </button>
+        </div>
+        <ul data-list="authors"></ul>
+      </section>
+
+      <section class="full">
+        <div class="section-head">
+          <div class="section-title">
+            <span class="section-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 3v12"></path>
+                <path d="M7 10l5 5 5-5"></path>
+                <path d="M5 21h14"></path>
+              </svg>
+            </span>
+            <h2>导入配置</h2>
+          </div>
+        </div>
+        <div class="io">
+          <textarea id="import-text" spellcheck="false" placeholder="粘贴导出的 JSON 配置"></textarea>
+          <div class="io-actions">
+            <button id="import-config" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M12 3v12"></path>
+                <path d="M7 10l5 5 5-5"></path>
+                <path d="M5 21h14"></path>
+              </svg>
+              导入
+            </button>
+            <button id="clear-import" class="secondary" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M4 7h16"></path>
+                <path d="M10 11v6"></path>
+                <path d="M14 11v6"></path>
+                <path d="M9 7V4h6v3"></path>
+              </svg>
+              清空
+            </button>
+          </div>
+          <div id="message" class="message" role="status"></div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script src="options.js"></script>
+</body>
+</html>

@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>do-trash</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #1c1c1e;
+      --ink-soft: #4b4b50;
+      --paper: #ffffff;
+      --panel: #f8f8f5;
+      --line: #deded8;
+      --line-soft: #ecece7;
+      --accent: #ffb003;
+      --accent-strong: #c57f00;
+      --success: #2f7d4f;
+      --danger: #d14d41;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background: var(--panel);
+    }
+
+    body {
+      width: 336px;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      background: var(--panel);
+    }
+
+    .shell {
+      border: 0;
+      border-radius: 0;
+      background: var(--paper);
+      overflow: hidden;
+      box-shadow: none;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 13px 14px;
+      border-bottom: 1px solid var(--line-soft);
+      background:
+        linear-gradient(90deg, rgba(255, 176, 3, 0.16), rgba(255, 176, 3, 0)),
+        var(--panel);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .mark {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      background: transparent;
+      color: var(--accent);
+      box-shadow: none;
+    }
+
+    .mark img {
+      width: 34px;
+      height: 34px;
+      display: block;
+      border-radius: 10px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 16px;
+      line-height: 22px;
+      font-weight: 750;
+    }
+
+    .status {
+      margin-top: 1px;
+      color: var(--ink-soft);
+      font-size: 12px;
+      line-height: 16px;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-flex;
+      width: 42px;
+      height: 24px;
+      flex: 0 0 auto;
+    }
+
+    .switch input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .slider {
+      width: 100%;
+      border-radius: 999px;
+      background: #c9c9c3;
+      cursor: pointer;
+      transition: background 0.18s ease;
+    }
+
+    .slider::before {
+      content: "";
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      left: 3px;
+      top: 3px;
+      border-radius: 50%;
+      background: var(--paper);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.28);
+      transition: transform 0.18s ease;
+    }
+
+    input:checked + .slider {
+      background: var(--accent);
+    }
+
+    input:checked + .slider::before {
+      transform: translateX(18px);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      padding: 12px 12px 10px;
+    }
+
+    .stat {
+      border: 1px solid var(--line-soft);
+      border-radius: 7px;
+      padding: 10px;
+      background: var(--panel);
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 20px;
+      line-height: 24px;
+      color: var(--ink);
+    }
+
+    .stat span {
+      display: block;
+      margin-top: 3px;
+      color: var(--ink-soft);
+      font-size: 12px;
+      line-height: 16px;
+    }
+
+    .quick {
+      padding: 0 12px 12px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 12px;
+      line-height: 16px;
+      color: var(--ink-soft);
+    }
+
+    .input-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    input[type="text"] {
+      min-width: 0;
+      height: 36px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 0 10px;
+      box-sizing: border-box;
+      font: inherit;
+      font-size: 13px;
+      color: var(--ink);
+      background: var(--paper);
+      outline: none;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(255, 176, 3, 0.18);
+    }
+
+    button {
+      height: 36px;
+      border: 1px solid var(--ink);
+      border-radius: 6px;
+      padding: 0 11px;
+      background: var(--ink);
+      color: var(--paper);
+      cursor: pointer;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: transform 0.14s ease, border-color 0.14s ease, background 0.14s ease;
+    }
+
+    button svg {
+      width: 15px;
+      height: 15px;
+    }
+
+    button.secondary {
+      border-color: var(--line);
+      background: var(--paper);
+      color: var(--ink);
+    }
+
+    .action-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .action-row button {
+      width: 100%;
+    }
+
+    .size-panel {
+      display: none;
+      margin-top: 8px;
+      padding: 10px;
+      border: 1px solid var(--line-soft);
+      border-radius: 7px;
+      background: var(--panel);
+    }
+
+    .size-panel.is-open {
+      display: block;
+    }
+
+    .size-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+      color: var(--ink-soft);
+      font-size: 12px;
+      line-height: 16px;
+    }
+
+    .size-value {
+      color: var(--accent-strong);
+      font-weight: 750;
+    }
+
+    .size-control {
+      display: grid;
+      grid-template-columns: 36px 1fr 36px 64px;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .size-control button {
+      width: 100%;
+      padding: 0;
+    }
+
+    .size-control .reset {
+      padding: 0 10px;
+    }
+
+    .size-preview {
+      height: 36px;
+      border: 1px solid rgba(255, 176, 3, 0.42);
+      border-radius: 6px;
+      background: #fff7df;
+      color: var(--accent-strong);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 750;
+      box-sizing: border-box;
+    }
+
+    button:hover {
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .message {
+      min-height: 18px;
+      color: var(--success);
+      font-size: 12px;
+      line-height: 18px;
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand">
+        <div class="mark" aria-hidden="true">
+          <img src="assets/icon-128.png" alt="">
+        </div>
+        <div>
+          <h1>do-trash</h1>
+          <div id="status-text" class="status">运行中</div>
+        </div>
+      </div>
+      <label class="switch" title="启用过滤">
+        <input id="enabled" type="checkbox">
+        <span class="slider"></span>
+      </label>
+    </header>
+
+    <section class="stats" aria-label="当前页面统计">
+      <div class="stat">
+        <strong id="trashed-count">0</strong>
+        <span>已收纳</span>
+      </div>
+      <div class="stat">
+        <strong id="scanned-count">0</strong>
+        <span>已扫描</span>
+      </div>
+    </section>
+
+    <section class="quick">
+      <label for="keyword">快速添加关键词</label>
+      <div class="input-row">
+        <input id="keyword" type="text" placeholder="输入要隐藏的关键词">
+        <button id="add-keyword" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 5v14M5 12h14"></path>
+          </svg>
+          添加
+        </button>
+      </div>
+
+      <div class="action-row">
+        <button id="floating-size-toggle" class="secondary" type="button" aria-expanded="false" aria-controls="floating-size-panel">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3"></path>
+            <path d="M16 3h3a2 2 0 0 1 2 2v3"></path>
+            <path d="M8 21H5a2 2 0 0 1-2-2v-3"></path>
+            <path d="M16 21h3a2 2 0 0 0 2-2v-3"></path>
+            <path d="M9 12h6"></path>
+            <path d="M12 9v6"></path>
+          </svg>
+          悬浮图标
+        </button>
+        <button id="open-options" class="secondary" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"></path>
+            <path d="M19.4 15a1.8 1.8 0 0 0 .36 1.98l.04.04a2 2 0 0 1-2.83 2.83l-.04-.04a1.8 1.8 0 0 0-1.98-.36 1.8 1.8 0 0 0-1.1 1.65V21a2 2 0 0 1-4 0v-.06a1.8 1.8 0 0 0-1.08-1.65 1.8 1.8 0 0 0-1.98.36l-.04.04a2 2 0 0 1-2.83-2.83l.04-.04A1.8 1.8 0 0 0 4.6 15a1.8 1.8 0 0 0-1.65-1.1H3a2 2 0 0 1 0-4h.06A1.8 1.8 0 0 0 4.7 8.82a1.8 1.8 0 0 0-.36-1.98l-.04-.04a2 2 0 0 1 2.83-2.83l.04.04a1.8 1.8 0 0 0 1.98.36A1.8 1.8 0 0 0 10.25 3V3a2 2 0 0 1 4 0v.06a1.8 1.8 0 0 0 1.1 1.65 1.8 1.8 0 0 0 1.98-.36l.04-.04a2 2 0 0 1 2.83 2.83l-.04.04a1.8 1.8 0 0 0-.36 1.98 1.8 1.8 0 0 0 1.65 1.1H21a2 2 0 0 1 0 4h-.06A1.8 1.8 0 0 0 19.4 15z"></path>
+          </svg>
+          完整设置
+        </button>
+      </div>
+      <div id="floating-size-panel" class="size-panel">
+        <div class="size-head">
+          <span>悬浮垃圾桶大小</span>
+          <span id="floating-size-value" class="size-value">38 px</span>
+        </div>
+        <div class="size-control">
+          <button id="decrease-floating-size" class="secondary" type="button" title="减小悬浮图标" aria-label="减小悬浮图标">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M5 12h14"></path>
+            </svg>
+          </button>
+          <div id="floating-size-preview" class="size-preview">38 px</div>
+          <button id="increase-floating-size" class="secondary" type="button" title="增大悬浮图标" aria-label="增大悬浮图标">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 5v14M5 12h14"></path>
+            </svg>
+          </button>
+          <button id="reset-floating-size" class="secondary reset" type="button">重置</button>
+        </div>
+      </div>
+      <div id="message" class="message" role="status"></div>
+    </section>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

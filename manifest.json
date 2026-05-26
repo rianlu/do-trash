@@ -1,0 +1,38 @@
+{
+  "manifest_version": 3,
+  "name": "do-trash",
+  "version": "0.1.0",
+  "description": "把 LINUX.DO 列表页中命中规则的帖子收纳到本地垃圾桶.",
+  "icons": {
+    "16": "assets/icon-16.png",
+    "32": "assets/icon-32.png",
+    "48": "assets/icon-48.png",
+    "128": "assets/icon-128.png"
+  },
+  "permissions": ["storage"],
+  "host_permissions": ["https://linux.do/*"],
+  "action": {
+    "default_title": "do-trash",
+    "default_icon": {
+      "16": "assets/icon-16.png",
+      "32": "assets/icon-32.png",
+      "48": "assets/icon-48.png",
+      "128": "assets/icon-128.png"
+    },
+    "default_popup": "popup.html"
+  },
+  "options_page": "options.html",
+  "content_scripts": [
+    {
+      "matches": ["https://linux.do/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["assets/floating-icon.png"],
+      "matches": ["https://linux.do/*"]
+    }
+  ]
+}
