@@ -8,6 +8,7 @@
 
   <p>
     <img alt="Chrome Extension" src="https://img.shields.io/badge/Chrome-Extension-ffb003?style=for-the-badge" />
+    <img alt="Edge Extension" src="https://img.shields.io/badge/Edge-Extension-1473e6?style=for-the-badge" />
     <img alt="Firefox Extension" src="https://img.shields.io/badge/Firefox-Extension-ff7139?style=for-the-badge" />
     <img alt="Manifest V3" src="https://img.shields.io/badge/Manifest-V3-1c1c1e?style=for-the-badge" />
     <img alt="LINUX.DO" src="https://img.shields.io/badge/LINUX.DO-Focused-c57f00?style=for-the-badge" />
@@ -22,7 +23,7 @@
 - 垃圾桶支持拖拽, 自动贴边, 计数角标和展开面板
 - 可在插件弹窗里显示或隐藏悬浮垃圾桶, 并快速调整悬浮图标大小
 - 支持单条还原和当前页全部还原
-- 支持 Chrome 和 Firefox WebExtension 版本
+- 支持 Chrome, Edge 和 Firefox WebExtension 版本
 - 配置保存在浏览器本地, 不上传任何数据
 
 ## 截图
@@ -49,10 +50,10 @@
 
 ## 安装
 
-### Chrome
+### Chrome / Edge
 
 1. 从 Release 下载 `do-trash-v0.2.0-chrome.zip` 并解压.
-2. 打开 Chrome 扩展管理页: `chrome://extensions`.
+2. Chrome 打开 `chrome://extensions`, Edge 打开 `edge://extensions`.
 3. 开启右上角"开发者模式".
 4. 点击"加载已解压的扩展程序".
 5. 选择解压后的 `do-trash-v0.2.0-chrome` 文件夹.
@@ -65,6 +66,8 @@
 4. 选择解压后的 `do-trash-v0.2.0-firefox/manifest.json`.
 
 Firefox 临时载入适合测试反馈, 当前 Firefox 构建要求 Firefox 140+; 正式长期安装需要 AMO 或签名后的 `.xpi`.
+
+暂不提供油猴脚本版本. 当前优先维护 Chrome, Edge 和 Firefox 扩展体验.
 
 ## 使用
 
@@ -114,7 +117,7 @@ Firefox 临时载入适合测试反馈, 当前 Firefox 构建要求 Firefox 140+
 
 ## 本地开发
 
-本项目是原生 Manifest V3 WebExtension, 根目录可直接作为 Chrome 开发目录加载. Firefox 版本通过构建脚本生成到 `dist/`, 构建产物不进入源码树.
+本项目是原生 Manifest V3 WebExtension, 根目录可直接作为 Chrome/Edge 开发目录加载. Firefox 版本通过构建脚本生成到 `dist/`, 构建产物不进入源码树.
 
 常用校验:
 
@@ -130,18 +133,22 @@ node scripts/build.mjs
 
 ## 仓库结构
 
-- `manifest.json`: Chrome 扩展清单
+- `manifest.json`: Chrome/Edge 扩展清单
 - `manifest.firefox.json`: Firefox 扩展清单
 - `compat.js`: Chrome/Firefox 扩展 API 兼容层
 - `content.js`: LINUX.DO 页面注入脚本, 负责扫描, 过滤和悬浮垃圾桶
 - `popup.html` / `popup.js`: 浏览器工具栏弹窗
 - `options.html` / `options.js`: 完整设置页
 - `assets/`: 扩展图标, 悬浮图标和 README 截图资源
-- `scripts/build.mjs`: 生成 Chrome 和 Firefox 发布包
+- `scripts/build.mjs`: 生成 Chrome/Edge 和 Firefox 发布包
 
 ## 友情链接
 
 - [LINUX DO](https://linux.do) 社区文化: 真诚, 友善, 团结, 专业, 共建你我引以为荣之社区
+
+## 许可证
+
+本项目基于 [MIT License](./LICENSE) 开源.
 
 ## 免责声明
 

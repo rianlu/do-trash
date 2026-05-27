@@ -66,7 +66,7 @@ async function buildTarget(target, manifestFile) {
 async function zipTarget(target) {
   const folderName = `do-trash-v${version}-${target}`;
   const zipPath = path.join(releaseRoot, `${folderName}.zip`);
-  await execFileAsync('zip', ['-qr', zipPath, folderName], { cwd: buildRoot });
+  await execFileAsync('zip', ['-qr', zipPath, '.'], { cwd: path.join(buildRoot, folderName) });
 }
 
 async function copy(source, destination) {
