@@ -1,12 +1,12 @@
-# do-trash Chrome 插件版开发文档
+# do-trash WebExtension 开发文档
 
 ## 1. 产品结论
 
-- 建设一个本地自用 Chrome Manifest V3 扩展.
+- 建设一个本地自用 Chrome/Firefox Manifest V3 WebExtension.
 - 仅在 `https://linux.do/*` 页面运行.
 - 自动把命中规则的帖子从首页, 列表页和搜索页隐藏, 默认放入页面悬浮垃圾桶.
-- 使用 `chrome.storage.local` 保存配置, 不建设服务端, 不上传数据.
-- 当前交付范围: 关键词, 类别, 标签, 作者规则, 页面垃圾桶, popup 快捷控制, options 完整设置, 配置导入导出.
+- 使用浏览器扩展本地 storage 保存配置, 不建设服务端, 不上传数据.
+- 当前交付范围: 关键词, 类别, 标签, 作者规则, 页面垃圾桶, popup 快捷控制, options 完整设置, 配置导入导出, Chrome/Firefox 构建产物.
 - 默认不内置任何过滤关键词, 规则完全由用户自行填写.
 
 ## 2. 固定边界
@@ -26,7 +26,7 @@
 - 在页面右侧创建悬浮垃圾桶按钮.
 - 支持拖拽悬浮按钮.
 - 拖拽松手后自动吸附到左右边缘.
-- 使用 `chrome.storage.local` 记忆悬浮按钮位置.
+- 使用扩展本地 storage 记忆悬浮按钮位置.
 - 默认悬浮图标大小为 `38px`.
 - 支持通过 popup 关闭悬浮垃圾桶入口.
 - 关闭悬浮垃圾桶后, 页面过滤继续生效, 但不展示悬浮按钮, 计数角标和垃圾桶面板.
@@ -72,9 +72,9 @@
 
 ### 4.1 配置键
 
-- 使用 `chrome.storage.local` 的 `doTrashConfig` 保存配置.
-- 使用 `chrome.storage.local` 的 `doTrashStats` 保存最近一次页面统计.
-- 使用 `chrome.storage.local` 的 `doTrashPosition` 保存悬浮垃圾桶位置.
+- 使用扩展本地 storage 的 `doTrashConfig` 保存配置.
+- 使用扩展本地 storage 的 `doTrashStats` 保存最近一次页面统计.
+- 使用扩展本地 storage 的 `doTrashPosition` 保存悬浮垃圾桶位置.
 
 ### 4.2 配置结构
 
@@ -116,33 +116,41 @@ do-trash/
 │   ├── icon-32.png
 │   ├── icon-48.png
 │   ├── icon-128.png
-│   ├── icon-source-trimmed.png
-│   └── floating-icon.png
-├── manifest.json
+│   ├── floating-icon.png
+│   └── screenshots/
+├── scripts/
+│   └── build.mjs
+├── compat.js
 ├── content.js
+├── manifest.json
+├── manifest.firefox.json
 ├── popup.html
 ├── popup.js
 ├── options.html
 ├── options.js
 ├── README.md
-└── do-trash (Chrome 插件版) 开发文档.md
+└── do-trash WebExtension 开发文档.md
 ```
 
-### 5.2 manifest
+### 5.2 manifest 与构建
 
 - 使用 Manifest V3.
+- `manifest.json` 作为 Chrome 源 manifest.
+- `manifest.firefox.json` 作为 Firefox 源 manifest, 包含 `browser_specific_settings.gecko.id` 和无数据收集声明.
+- `scripts/build.mjs` 输出 `dist/build` 和 `dist/release`, 源码目录不保存构建产物.
 - 声明 `storage` 权限.
 - 声明 `https://linux.do/*` host permission.
-- 声明 `content.js` 注入到 LINUX.DO.
+- 声明 `compat.js` 和 `content.js` 注入到 LINUX.DO.
 - 声明 `popup.html` 作为 action popup.
 - 声明 `options.html` 作为设置页.
 - 声明 `assets/icon-*.png` 作为扩展图标.
 - 声明 `assets/floating-icon.png` 作为 content script 可访问资源.
 - 不声明 `tabs` 权限.
 
-### 5.3 content script
+### 5.3 compat 与 content script
 
-- 读取并规范化 `doTrashConfig`.
+- `compat.js` 统一封装 Chrome callback API 和 Firefox `browser.*` Promise API.
+- `content.js` 读取并规范化 `doTrashConfig`.
 - 根据 `ui.showFloating` 创建或移除页面悬浮垃圾桶.
 - 使用 `assets/floating-icon.png` 作为页面悬浮按钮和面板品牌图标.
 - 支持扩展重新加载后的 `Extension context invalidated` 保护, 旧实例自动停止并清理 UI.
@@ -153,7 +161,7 @@ do-trash/
 - 隐藏命中帖子并写入当前页面隐藏列表.
 - 使用 `MutationObserver` 监听动态加载.
 - 使用 debounce 限制重复扫描.
-- 监听 `chrome.storage.onChanged`, 配置变化后重新扫描.
+- 通过 `compat.js` 监听 storage 变化, 配置变化后重新扫描.
 - 使用 DOM API 创建用户可见内容, 禁止把帖子标题直接拼进 `innerHTML`.
 
 ### 5.4 popup
@@ -176,7 +184,8 @@ do-trash/
 
 ## 6. 验收标准
 
-- 扩展能通过 Chrome 扩展页以开发者模式加载.
+- Chrome 构建产物能通过 Chrome 扩展页以开发者模式加载.
+- Firefox 构建产物能通过 Firefox 140+ 的 `about:debugging` 临时加载.
 - 打开 LINUX.DO 首页, 列表页或搜索页后默认出现垃圾桶按钮.
 - 关闭悬浮垃圾桶后, 页面不显示垃圾桶按钮, 但命中规则的帖子仍会被隐藏.
 - 用户添加关键词后, 命中标题的帖子会被隐藏.
@@ -192,7 +201,8 @@ do-trash/
 - options 能重置默认配置.
 - 默认配置不内置过滤关键词.
 - JS 文件通过语法检查.
-- manifest JSON 通过解析检查.
+- Chrome 与 Firefox manifest JSON 通过解析检查.
+- `node scripts/build.mjs` 能生成 Chrome 和 Firefox 发布包.
 
 ## 7. 已知限制
 
@@ -201,6 +211,7 @@ do-trash/
 - 当前页面还原只在本次页面会话中生效, 刷新后仍按规则重新判断.
 - 垃圾桶记录只表示当前页面扫描结果, 不作为跨页面历史记录.
 - 搜索页过滤基于页面渲染出的搜索结果 DOM, 不调用搜索接口.
+- Firefox 测试包要求 Firefox 140+, 正式长期安装需要 AMO 或签名后的 `.xpi`.
 
 ## 8. 开发顺序
 
@@ -208,4 +219,4 @@ do-trash/
 - 再实现 popup 快捷控制.
 - 再实现 options 完整设置.
 - 再补充图标, 拖拽吸附, 面板体验和搜索页适配.
-- 最后执行 JSON 解析, JS 语法检查, 本地加载检查.
+- 最后执行 JSON 解析, JS 语法检查, 构建脚本和本地加载检查.

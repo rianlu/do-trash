@@ -2,6 +2,7 @@ const CONFIG_KEY = 'doTrashConfig';
 const STATS_KEY = 'doTrashStats';
 const CONFIG_VERSION = 1;
 const DEFAULT_FLOATING_SIZE = 38;
+const HOST_PERMISSION = { origins: ['https://linux.do/*'] };
 const DEFAULT_CONFIG = {
   schemaVersion: CONFIG_VERSION,
   enabled: true,
@@ -33,6 +34,8 @@ const trashedCount = document.getElementById('trashed-count');
 const scannedCount = document.getElementById('scanned-count');
 const message = document.getElementById('message');
 const statusText = document.getElementById('status-text');
+const permissionSetting = document.getElementById('permission-setting');
+const grantPermissionButton = document.getElementById('grant-permission');
 
 let config = clone(DEFAULT_CONFIG);
 
@@ -100,13 +103,14 @@ function normalizeFloatingSize(value) {
 async function init() {
   await loadConfig();
   await loadStats();
+  await renderHostPermission();
   bindEvents();
 }
 
 async function loadConfig() {
-  const result = await chrome.storage.local.get([CONFIG_KEY]);
+  const result = await globalThis.doTrashCompat.storageGet([CONFIG_KEY]);
   config = normalizeConfig(result[CONFIG_KEY]);
-  await chrome.storage.local.set({ [CONFIG_KEY]: config });
+  await globalThis.doTrashCompat.storageSet({ [CONFIG_KEY]: config });
   enabledInput.checked = config.enabled;
   showFloatingInput.checked = config.ui.showFloating;
   renderStatus();
@@ -114,7 +118,7 @@ async function loadConfig() {
 }
 
 async function loadStats() {
-  const result = await chrome.storage.local.get([STATS_KEY]);
+  const result = await globalThis.doTrashCompat.storageGet([STATS_KEY]);
   const stats = result[STATS_KEY] || {};
   trashedCount.textContent = String(Number.isFinite(stats.trashedCount) ? stats.trashedCount : 0);
   scannedCount.textContent = String(Number.isFinite(stats.scannedCount) ? stats.scannedCount : 0);
@@ -132,6 +136,8 @@ function bindEvents() {
     await saveConfig(showFloatingInput.checked ? '悬浮垃圾桶已显示' : '悬浮垃圾桶已隐藏');
   });
 
+  grantPermissionButton.addEventListener('click', requestHostPermission);
+
   addKeywordButton.addEventListener('click', addKeyword);
   keywordInput.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') addKeyword();
@@ -143,10 +149,10 @@ function bindEvents() {
   resetFloatingSizeButton.addEventListener('click', resetFloatingSize);
 
   openOptionsButton.addEventListener('click', () => {
-    chrome.runtime.openOptionsPage();
+    globalThis.doTrashCompat.openOptionsPage();
   });
 
-  chrome.storage.onChanged.addListener((changes, areaName) => {
+  globalThis.doTrashCompat.storageOnChanged((changes, areaName) => {
     if (areaName !== 'local') return;
     if (changes[STATS_KEY]) loadStats();
     if (changes[CONFIG_KEY]) {
@@ -157,6 +163,26 @@ function bindEvents() {
       renderFloatingSettings();
     }
   });
+}
+
+async function renderHostPermission() {
+  const granted = await hasHostPermission();
+  permissionSetting.hidden = granted;
+}
+
+async function hasHostPermission() {
+  if (!globalThis.doTrashCompat.permissionsContains) return true;
+  try {
+    return await globalThis.doTrashCompat.permissionsContains(HOST_PERMISSION);
+  } catch (error) {
+    return true;
+  }
+}
+
+async function requestHostPermission() {
+  const granted = await globalThis.doTrashCompat.permissionsRequest(HOST_PERMISSION);
+  permissionSetting.hidden = granted;
+  setMessage(granted ? '已授权, 请刷新 LINUX.DO 页面' : '未完成站点授权', granted ? 'success' : 'warning');
 }
 
 async function addKeyword() {
@@ -177,7 +203,7 @@ async function addKeyword() {
 
 async function saveConfig(text) {
   config = normalizeConfig(config);
-  await chrome.storage.local.set({ [CONFIG_KEY]: config });
+  await globalThis.doTrashCompat.storageSet({ [CONFIG_KEY]: config });
   renderStatus();
   renderFloatingSettings();
   setMessage(text);

@@ -90,9 +90,9 @@ async function init() {
 }
 
 async function loadConfig() {
-  const result = await chrome.storage.local.get([CONFIG_KEY]);
+  const result = await globalThis.doTrashCompat.storageGet([CONFIG_KEY]);
   config = normalizeConfig(result[CONFIG_KEY]);
-  await chrome.storage.local.set({ [CONFIG_KEY]: config });
+  await globalThis.doTrashCompat.storageSet({ [CONFIG_KEY]: config });
 }
 
 function bindEvents() {
@@ -114,7 +114,7 @@ function bindEvents() {
   });
   document.getElementById('reset-config').addEventListener('click', resetConfig);
 
-  chrome.storage.onChanged.addListener((changes, areaName) => {
+  globalThis.doTrashCompat.storageOnChanged((changes, areaName) => {
     if (areaName !== 'local' || !changes[CONFIG_KEY]) return;
     config = normalizeConfig(changes[CONFIG_KEY].newValue);
     render();
@@ -228,7 +228,7 @@ async function removeRule(type, index) {
 
 async function saveConfig(text) {
   config = normalizeConfig(config);
-  await chrome.storage.local.set({ [CONFIG_KEY]: config });
+  await globalThis.doTrashCompat.storageSet({ [CONFIG_KEY]: config });
   render();
   setMessage(text);
 }

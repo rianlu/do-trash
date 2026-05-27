@@ -148,11 +148,7 @@
   }
 
   function hasExtensionContext() {
-    try {
-      return typeof chrome !== 'undefined' && chrome.runtime && Boolean(chrome.runtime.id);
-    } catch (error) {
-      return false;
-    }
+    return globalThis.doTrashCompat && globalThis.doTrashCompat.hasExtensionContext();
   }
 
   function isInvalidContextError(error) {
@@ -191,7 +187,7 @@
       return Promise.resolve({});
     }
     try {
-      return chrome.storage.local.get(keys).catch((error) => {
+      return globalThis.doTrashCompat.storageGet(keys).catch((error) => {
         handleAsyncError(error);
         return {};
       });
@@ -207,7 +203,7 @@
       return Promise.resolve();
     }
     try {
-      return chrome.storage.local.set(value).catch(handleAsyncError);
+      return globalThis.doTrashCompat.storageSet(value).catch(handleAsyncError);
     } catch (error) {
       handleAsyncError(error);
       return Promise.resolve();
@@ -228,7 +224,7 @@
       return;
     }
     try {
-      chrome.storage.onChanged.addListener((changes, areaName) => {
+      globalThis.doTrashCompat.storageOnChanged((changes, areaName) => {
         if (isDisposed) return;
         if (areaName !== 'local' || !changes[CONFIG_KEY]) return;
         config = normalizeConfig(changes[CONFIG_KEY].newValue);
@@ -982,7 +978,7 @@
     const image = document.createElement('img');
     image.className = className;
     try {
-      image.src = chrome.runtime.getURL(path);
+      image.src = globalThis.doTrashCompat.getURL(path);
     } catch (error) {
       handleAsyncError(error);
       return null;

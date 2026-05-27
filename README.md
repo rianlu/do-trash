@@ -8,6 +8,7 @@
 
   <p>
     <img alt="Chrome Extension" src="https://img.shields.io/badge/Chrome-Extension-ffb003?style=for-the-badge" />
+    <img alt="Firefox Extension" src="https://img.shields.io/badge/Firefox-Extension-ff7139?style=for-the-badge" />
     <img alt="Manifest V3" src="https://img.shields.io/badge/Manifest-V3-1c1c1e?style=for-the-badge" />
     <img alt="LINUX.DO" src="https://img.shields.io/badge/LINUX.DO-Focused-c57f00?style=for-the-badge" />
   </p>
@@ -21,6 +22,7 @@
 - 垃圾桶支持拖拽, 自动贴边, 计数角标和展开面板
 - 可在插件弹窗里显示或隐藏悬浮垃圾桶, 并快速调整悬浮图标大小
 - 支持单条还原和当前页全部还原
+- 支持 Chrome 和 Firefox WebExtension 版本
 - 配置保存在浏览器本地, 不上传任何数据
 
 ## 截图
@@ -47,11 +49,22 @@
 
 ## 安装
 
-1. 克隆或下载本仓库.
+### Chrome
+
+1. 从 Release 下载 `do-trash-v0.2.0-chrome.zip` 并解压.
 2. 打开 Chrome 扩展管理页: `chrome://extensions`.
 3. 开启右上角"开发者模式".
 4. 点击"加载已解压的扩展程序".
-5. 选择本仓库目录.
+5. 选择解压后的 `do-trash-v0.2.0-chrome` 文件夹.
+
+### Firefox
+
+1. 从 Release 下载 `do-trash-v0.2.0-firefox.zip` 并解压.
+2. 打开 Firefox 调试页: `about:debugging#/runtime/this-firefox`.
+3. 点击"临时载入附加组件".
+4. 选择解压后的 `do-trash-v0.2.0-firefox/manifest.json`.
+
+Firefox 临时载入适合测试反馈, 当前 Firefox 构建要求 Firefox 140+; 正式长期安装需要 AMO 或签名后的 `.xpi`.
 
 ## 使用
 
@@ -101,24 +114,30 @@
 
 ## 本地开发
 
-本项目是原生 Chrome MV3 扩展, 不需要构建步骤.
+本项目是原生 Manifest V3 WebExtension, 根目录可直接作为 Chrome 开发目录加载. Firefox 版本通过构建脚本生成到 `dist/`, 构建产物不进入源码树.
 
 常用校验:
 
 ```bash
+node --check compat.js
 node --check content.js
 node --check popup.js
 node --check options.js
-node -e 'JSON.parse(require("fs").readFileSync("manifest.json", "utf8")); console.log("manifest ok")'
+node --check scripts/build.mjs
+node -e 'JSON.parse(require("fs").readFileSync("manifest.json", "utf8")); JSON.parse(require("fs").readFileSync("manifest.firefox.json", "utf8")); console.log("manifest ok")'
+node scripts/build.mjs
 ```
 
 ## 仓库结构
 
 - `manifest.json`: Chrome 扩展清单
+- `manifest.firefox.json`: Firefox 扩展清单
+- `compat.js`: Chrome/Firefox 扩展 API 兼容层
 - `content.js`: LINUX.DO 页面注入脚本, 负责扫描, 过滤和悬浮垃圾桶
 - `popup.html` / `popup.js`: 浏览器工具栏弹窗
 - `options.html` / `options.js`: 完整设置页
-- `assets/`: 扩展图标和悬浮图标资源
+- `assets/`: 扩展图标, 悬浮图标和 README 截图资源
+- `scripts/build.mjs`: 生成 Chrome 和 Firefox 发布包
 
 ## 友情链接
 

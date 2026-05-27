@@ -192,6 +192,19 @@
       line-height: 16px;
     }
 
+    .permission-setting[hidden] {
+      display: none;
+    }
+
+    .permission-setting {
+      border-color: rgba(255, 176, 3, 0.36);
+      background: #fff8e4;
+    }
+
+    .permission-setting button {
+      flex: 0 0 auto;
+    }
+
     label {
       display: block;
       margin-bottom: 6px;
@@ -422,6 +435,14 @@
       </div>
     </section>
 
+    <section id="permission-setting" class="display-setting permission-setting" aria-label="LINUX.DO 授权设置" hidden>
+      <div>
+        <strong>授权 LINUX.DO</strong>
+        <span>Firefox 需要授权后才会过滤页面</span>
+      </div>
+      <button id="grant-permission" type="button">授权</button>
+    </section>
+
     <section class="display-setting" aria-label="悬浮垃圾桶显示设置">
       <div>
         <strong>显示悬浮垃圾桶</strong>
@@ -489,6 +510,7 @@
     </section>
   </div>
 
+  <script src="compat.js"></script>
   <script src="popup.js"></script>
 </body>
 </html>
