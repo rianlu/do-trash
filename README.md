@@ -60,12 +60,11 @@
 
 ### Firefox
 
-1. 从 Release 下载 `do-trash-v0.2.0-firefox.zip` 并解压.
-2. 打开 Firefox 调试页: `about:debugging#/runtime/this-firefox`.
-3. 点击"临时载入附加组件".
-4. 选择解压后的 `do-trash-v0.2.0-firefox/manifest.json`.
+1. 打开 Firefox Add-ons 页面: [do-trash](https://addons.mozilla.org/firefox/addon/do-trash/).
+2. 点击"添加到 Firefox".
+3. 安装完成后打开 LINUX.DO, 按需授权扩展在站点上运行.
 
-Firefox 临时载入适合测试反馈, 当前 Firefox 构建要求 Firefox 140+; 正式长期安装需要 AMO 或签名后的 `.xpi`.
+`do-trash-v0.2.0-firefox.zip` 仅用于 AMO 提交签名或本地临时调试, 不作为普通用户的长期安装包. 普通 Firefox 用户请优先通过 AMO 商店安装.
 
 暂不提供油猴脚本版本. 当前优先维护 Chrome, Edge 和 Firefox 扩展体验.
 
